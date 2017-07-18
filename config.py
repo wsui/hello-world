@@ -13,4 +13,5 @@ class ProdConfig(Config):
 class DevConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///databse.db'
-#    SQLALCHEMY_ECHO = True
+    # SQLALCHEMY_ECHO = True  #显示详细数据库操作
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
