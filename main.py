@@ -100,6 +100,14 @@ def hello_world():
     return '<h1>hello world!</h1><script>alert("hello world!");</script>'
 '''
 
+# 截取字符串指定长度
+@app.template_filter('j_str')
+def jstr(s, n):
+    if len(s)<n:
+        return s
+    else:
+        return s[:n]
+
 
 @app.route('/')
 @app.route('/<int:page>')
@@ -107,9 +115,11 @@ def home(page=1):
     posts = Post.query.order_by(
         Post.publish_date.desc()
     ).paginate(page, 10)
+    user = User.query.first()
     recent, top_tags = sidebar_data()
     return render_template(
-        'home.html',
+        'index.html',
+        user=user,
         posts=posts,
         recent=recent,
         top_tags=top_tags
@@ -124,6 +134,7 @@ def post(post_id):
     recent, top_tags = sidebar_data()
     return render_template(
         'post.html',
+        user=User.query.get(post.user_id),
         post=post,
         tags=tags,
         comments=comments,
