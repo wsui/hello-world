@@ -1,9 +1,10 @@
 # -*- coding:utf-8 -*-
 __author__ = 'wen'
 
-from  flask import Flask
+from  flask import Flask, render_template
 from config import DevConfig
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 
 app = Flask(__name__)
 app.config.from_object(DevConfig)
@@ -37,7 +38,7 @@ class Post(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     title = db.Column(db.String(255))
     text = db.Column(db.Text())
-    publish_data = db.Column(db.DateTime())
+    publish_date = db.Column(db.DateTime())
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id'))
     comments = db.relationship(
         'Comment',
@@ -54,7 +55,7 @@ class Post(db.Model):
         self.title = title
 
     def __repr__(self):
-        return '<Post "{},{},{},{},{}">'.format(self.title, self.id, self.user_id, self.publish_data, self.text)
+        return '<Post "{},{},{},{},{}">'.format(self.title, self.id, self.user_id, self.publish_date, self.text)
 
 
 # 标签
@@ -81,9 +82,82 @@ class Comment(db.Model):
         return '<Comment "{}">'.format(self.text[:15])
 
 
-@app.route('/')
+# 侧边栏函数
+def sidebar_data():
+    recent = Post.query.order_by(
+        Post.publish_date.desc()
+    ).limit(5).all()
+    post_tags = db.session.query(
+        Tag, func.count(tags.c.post_id).label('total')
+    ).join(
+        tags
+    ).group_by(Tag).order_by('total DESC').limit(5).all()
+    return recent, post_tags
+
+
+'''
 def hello_world():
     return '<h1>hello world!</h1><script>alert("hello world!");</script>'
+'''
+
+
+@app.route('/')
+@app.route('/<int:page>')
+def home(page=1):
+    posts = Post.query.order_by(
+        Post.publish_date.desc()
+    ).paginate(page, 10)
+    recent, top_tags = sidebar_data()
+    return render_template(
+        'home.html',
+        posts=posts,
+        recent=recent,
+        top_tags=top_tags
+    )
+
+
+@app.route('/post/<int:post_id>')
+def post(post_id):
+    post = Post.query.get_or_404(post_id)
+    tags = post.tags
+    comments = post.comments.order_by(Comment.date.desc()).all()
+    recent, top_tags = sidebar_data()
+    return render_template(
+        'post.html',
+        post=post,
+        tags=tags,
+        comments=comments,
+        recent=recent,
+        top_tags=top_tags
+    )
+
+
+@app.route('/tag/<string:tag_name>')
+def tag(tag_name):
+    tag = Tag.query.filter_by(title=tag_name).first_or_404()
+    posts = tag.posts.order_by(Post.publish_date.desc()).all()
+    recent, top_tags = sidebar_data()
+    return render_template(
+        'tag.html',
+        tag=tag,
+        posts=posts,
+        recent=recent,
+        top_tags=top_tags
+    )
+
+
+@app.route('/user/<string:username>')
+def user(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    posts = user.posts.order_by(Post.publish_date.desc()).all()
+    recent, top_tags = sidebar_data()
+    return render_template(
+        'user.html',
+        user=user,
+        posts=posts,
+        recent=recent,
+        top_tags=top_tags
+    )
 
 
 if __name__ == '__main__':
