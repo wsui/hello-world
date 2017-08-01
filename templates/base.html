@@ -2,7 +2,9 @@
     <nav>
         <ul class="pagination">
             <li>
-                <a href="{{ url_for('home',page=pagination.prev().page) }}" aria-label="Previous">
+                <a href="{{
+                url_for('home',page=pagination.prev().page)
+                }}" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
@@ -10,8 +12,8 @@
                 {% if page %}
                     {% if page !=pagination.page %}
                         <li>
-                            <a href="{{ url_for(endpoint,page=page) }}}">
-                                {{page}}}
+                            <a href="{{ url_for(endpoint,page=page) }}">
+                                {{ page }}}
                             </a>
                         </li>
                     {% else %}
@@ -41,7 +43,7 @@
 <body>
     <div class="container">
         <div class="jumbotron">
-            <h1><a hrf="{{ url_for('home') }}">My Blog</a></h1>
+            <h1><a href="{{ url_for('home') }}">My Blog</a></h1>
             <p>Welcome to the blog!</p>
         </div>
         {% block body %}

@@ -103,7 +103,7 @@ def hello_world():
 # 截取字符串指定长度
 @app.template_filter('j_str')
 def jstr(s, n):
-    if len(s)<n:
+    if len(s) < n:
         return s
     else:
         return s[:n]
