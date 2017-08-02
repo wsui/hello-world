@@ -53,6 +53,45 @@
             </ul>
         </div>
     </div>
+
+    <div class="col-lg-12">
+        <h3>New Comment:</h3>
+        <form method="post" action="{{ url_for('post',post_id=post.id) }}">
+            {{ form.hidden_tag() }}
+            <div class="form_group">
+                {{ form.name.label }}
+                {% if form.name.errors %}
+                    {% for e in form.name.errors %}
+                        <p class="help-block">{{ e }}</p>
+                    {% endfor %}
+                {% endif %}
+                {{ form.name(class_='form-control') }}
+            </div>
+            <div class="form_group">
+                {{ form.text.label }}
+                {% if form.text.errors %}
+                    {% for e in form.text.errors %}
+                        <p class="help-block">{{ e }}</p>
+                    {% endfor %}
+                {% endif %}
+                {{ form.text(class_='form-control') }}
+            </div>
+            <input class="btn btn-primary" type="submit" value="Add Comment" />
+        </form>
+    </div>
+
+     <div class="col-lg-12">
+         <h3>Comments({{ comments | length }})</h3>
+             {% for comment in comments %}
+             <div style="padding-left: 20px">
+                 <div class="row">
+                     <p style="color:#999999">By:&nbsp;<span style="color: #5bc0de">{{ comment.name }}</span>&nbsp;&nbsp;{{ on }}&nbsp;<span >{{ comment.date | string | j_str(19) | safe }}</span></p>
+                     <p>{{ comment.text }}</p>
+                 </div>
+             </div>
+             <hr/>
+             {% endfor %}
+     </div>
 </div>
 
 

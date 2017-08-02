@@ -3,7 +3,7 @@ __author__ = 'wen'
 
 
 class Config(object):
-    pass
+    SECRET_KEY = 'v2k7QMMNNF5HNghYCCo7ry5fWKs5QBDgG5E6vCfeoK76pEDgxhc6jMN0ylxli531NcVYHi'
 
 
 class ProdConfig(Config):
