@@ -6,7 +6,7 @@
          <div class="row">
             <div class="col-lg-12">
                 {% for tag in tags %}
-                <span><a style="background-color:#5bc0de;color: #ffffff;font-size: 150%" href="{{
+                <span><a style="background-color:#5bc0de;color: #ffffff;font-size: 150%;padding: 5px;border-radius: 5px" href="{{
                 url_for('tag',tag_name=tag.title)
                 }}">{{ tag.title }}</a>&nbsp;&nbsp;&nbsp;&nbsp;</span>
                 {% endfor %}
@@ -76,23 +76,24 @@
                 {% endif %}
                 {{ form.text(class_='form-control') }}
             </div>
+            <br/>
             <input class="btn btn-primary" type="submit" value="Add Comment" />
-        </form>
+         </form>
     </div>
 
      <div class="col-lg-12">
          <h3>Comments({{ comments | length }})</h3>
              {% for comment in comments %}
+             <hr/>
              <div style="padding-left: 20px">
                  <div class="row">
                      <p style="color:#999999">By:&nbsp;<span style="color: #5bc0de">{{ comment.name }}</span>&nbsp;&nbsp;{{ on }}&nbsp;<span >{{ comment.date | string | j_str(19) | safe }}</span></p>
                      <p>{{ comment.text }}</p>
                  </div>
              </div>
-             <hr/>
              {% endfor %}
      </div>
 </div>
 
-
 {% endblock %}
+
