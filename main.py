@@ -1,13 +1,14 @@
 # -*- coding:utf-8 -*-
 __author__ = 'wen'
 
-from flask import Flask, render_template
+from flask import Flask, g, session, abort, render_template, Blueprint, redirect, url_for
 from config import DevConfig
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired, Length
+from flask.views import View
 import datetime
 
 app = Flask(__name__)
@@ -100,18 +101,26 @@ def sidebar_data():
 
 
 # 评论验证
-class CommentForm(Form):
+class CommentForm(FlaskForm):
     name = StringField(
         'Name',
         validators=[DataRequired(), Length(max=255)]
     )
     text = TextAreaField(u'Comment', validators=[DataRequired()])
 
+# 使用蓝图
+blog_blueprint = Blueprint(
+    'blog',
+    __name__,
+    template_folder='templates/blog',
+    url_prefix='/blog'
+)
 
-'''
-def hello_world():
-    return '<h1>hello world!</h1><script>alert("hello world!");</script>'
-'''
+# 根目录重定向到蓝图
+@app.route('/')
+def index():
+    return redirect(url_for('blog.home'))
+
 
 # 截取字符串指定长度
 @app.template_filter('j_str')
@@ -122,8 +131,8 @@ def j_str(s, n):
         return s[:n]
 
 
-@app.route('/')
-@app.route('/<int:page>')
+@blog_blueprint.route('/')
+@blog_blueprint.route('/<int:page>')
 def home(page=1):
     posts = Post.query.order_by(
         Post.publish_date.desc()
@@ -139,7 +148,7 @@ def home(page=1):
     )
 
 
-@app.route('/post/<int:post_id>', methods=('get', 'post'))
+@blog_blueprint.route('/post/<int:post_id>', methods=('get', 'post'))
 def post(post_id):
     form = CommentForm()
     if form.validate_on_submit():
@@ -166,21 +175,26 @@ def post(post_id):
     )
 
 
-@app.route('/tag/<string:tag_name>')
+@blog_blueprint.route('/tag/<string:tag_name>')
 def tag(tag_name):
     tag = Tag.query.filter_by(title=tag_name).first_or_404()
     posts = tag.posts.order_by(Post.publish_date.desc()).all()
     recent, top_tags = sidebar_data()
+    post_users = {}
+    for p in posts:
+        user = User.query.get(p.user_id)
+        post_users[p.id] = user.username
     return render_template(
         'tag.html',
         tag=tag,
         posts=posts,
         recent=recent,
-        top_tags=top_tags
+        top_tags=top_tags,
+        post_users=post_users
     )
 
 
-@app.route('/user/<string:username>')
+@blog_blueprint.route('/user/<string:username>')
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
     posts = user.posts.order_by(Post.publish_date.desc()).all()
@@ -194,5 +208,44 @@ def user(username):
     )
 
 
+# 检查session变量是否带有用户信息
+@app.before_request
+def before_request():
+    if 'user_id' in session:
+        g.user = User.query.get(session['user_id'])
+
+
+@blog_blueprint.route('/restricted')
+def admin():
+    if g.user is None:
+        abort(403)
+    return render_template('admin.html')
+
+
+# 自定义错误404页面
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('page_not_found.html'), 404
+
+
+# 视图函数
+class GenericView(View):
+    methods = ['GET', 'POST']
+
+    def __init__(self, template):
+        self.template = template
+        super(GenericView, self).__init__()
+
+    def dispatch_request(self):
+        return render_template(self.template)
+
+
+app.add_url_rule(
+    '/', view_func=GenericView.as_view(
+        'home', template='home.html'
+    )
+)
+
+app.register_blueprint(blog_blueprint)
 if __name__ == '__main__':
     app.run()
