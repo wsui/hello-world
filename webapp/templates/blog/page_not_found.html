@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>404--此页面不存在!</title>
+    <style>
+        a {
+            font-size: 24px;
+            color: #5bc0de;
+            text-decoration: None
+        }
+
+        #box {
+            height: 600px;
+            width: 600px;
+            margin: 0 auto;
+            text-align: center
+        }
+
+        body {
+            background-color: #e1e1e1
+        }
+    </style>
+</head>
+<body>
+<div id="box">
+    <img src="../../static/imgs/404_page.jpg" height="400px"/>
+    <a href="{{url_for('.home')}}"><span id="timer">3</span>秒后自动前往首页</a><br/><br/>
+    <a href="javascript:void(0);" onclick="javascript:window.history.back();">返回上一页</a>
+    <script>
+        /*
+         window.setTimeout(function () {
+         window.location.href = "{{url_for('home')}}";
+         }, 3000);
+         */
+        var t = 3;
+        document.getElementById('timer').innerHTML = t;
+        setInterval(function () {
+            t--;
+            document.getElementById('timer').innerHTML = t;
+            if (t <= 0) {
+                window.location.href = "{{url_for('.home')}}";
+            }
+        }, 1000);
+    </script>
+</div>
+</body>
+</html>
