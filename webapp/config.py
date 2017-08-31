@@ -6,6 +6,8 @@ from os import path
 
 class Config(object):
     SECRET_KEY = 'v2k7QMMNNF5HNghYCCo7ry5fWKs5QBDgG5E6vCfeoK76pEDgxhc6jMN0ylxli531NcVYHi'
+    RECAPTCHA_PUBLIC_KEY = '6LcgcS4UAAAAAO0etGgGBcDfCvNGO5_wirtuosX5'
+    RECAPTCHA_PRIVATE_KEY = '6LcgcS4UAAAAAP9GMXZsNKW7ozf3l-t1Wj-Yq7ZH'
 
 
 class ProdConfig(Config):

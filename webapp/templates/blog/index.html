@@ -1,12 +1,22 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Home{% endblock title %}
 {% block body %}
+<div class="row">
+    <div>
+        <ul class="nav navbar-nav">
+            <li><a href="{{ url_for('.new_post') }}">Write</a></li>
+            <li><a href="{{ url_for('main.login') }}">Login</a></li>
+            <li><a href="{{ url_for('main.register') }}">Register</a></li>
+            <li><a href="{{ url_for('main.logout') }}">Logout</a></li>
+        </ul>
+    </div>
+</div>
 <div class="row">
     <div class="col-lg-9">
         {% for post in posts.items %}
         <div class="row">
             <div class="col-lg-12">
-                <h1>{{ post.title }}</h1>
+                <h3>{{ post.title }}</h3>
             </div>
         </div>
         <div class="row">
@@ -16,7 +26,7 @@
                     url_for('.user',username=user.username)
                     }}">{{user.username}}</a></span>
                     <span>&nbsp;&nbsp;</span>
-                    <span>{{ post.publish_date | string | j_str(19) | safe }}</span>
+                    <span>{{ post.publish_date | string | j_str() | safe }}</span>
                 </p>
             </div>
         </div>
@@ -53,4 +63,7 @@
         </div>
     </div>
 </div>
-{% endblock %}
+<div class="pagination">
+    {{ render_pagination(posts, '.home') }}
+</div>
+{% endblock body %}

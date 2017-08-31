@@ -24,7 +24,7 @@
 </head>
 <body>
 <div id="box">
-    <img src="../../static/imgs/404_page.jpg" height="400px"/>
+    <img src="/static/imgs/404_page.jpg" height="400px"/>
     <a href="{{url_for('.home')}}"><span id="timer">3</span>秒后自动前往首页</a><br/><br/>
     <a href="javascript:void(0);" onclick="javascript:window.history.back();">返回上一页</a>
     <script>
@@ -33,7 +33,7 @@
          window.location.href = "{{url_for('home')}}";
          }, 3000);
          */
-        var t = 3;
+        var t = 5;
         document.getElementById('timer').innerHTML = t;
         setInterval(function () {
             t--;

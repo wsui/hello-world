@@ -7,6 +7,8 @@ from flask.views import View
 
 from models import db
 from controllers.blog import blog_blueprint
+from controllers.main import main_blueprint
+from webapp.extensions import bcrypt,oid
 
 
 def create_app(objecrt_name):
@@ -14,6 +16,8 @@ def create_app(objecrt_name):
     app.config.from_object(DevConfig)
 
     db.init_app(app)
+    bcrypt.init_app(app)
+    oid.init_app(app)
 
     # 根目录重定向到蓝图
     @app.route('/')
@@ -33,6 +37,7 @@ def create_app(objecrt_name):
         return render_template('page_not_found.html'), 404
 
     app.register_blueprint(blog_blueprint)
+    app.register_blueprint(main_blueprint)
     return app
 
 
@@ -46,6 +51,7 @@ class GenericView(View):
 
     def dispatch_request(self):
         return render_template(self.template)
+
 
 """
 if __name__ == '__main__':

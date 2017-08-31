@@ -1,59 +1,119 @@
 {% macro render_pagination(pagination,endpoint) %}
 <nav>
     <ul class="pagination">
-        <li>
-            <a href="{{
-                url_for('home',page=pagination.prev().page)
-                }}" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-            </a>
-        </li>
-        {% for page in pagination.iter_pages() %}
-        {% if page %}
-        {% if page !=pagination.page %}
-        <li>
-            <a href="{{ url_for(endpoint,page=page) }}">
-                {{ page }}}
-            </a>
-        </li>
-        {% else %}
-        <li><a href="">{{ page }}}</a></li>
+        {% if pagination.pages>1 %}
+            {% if pagination.page!=1 %}
+                <li>
+                    <a href="{{
+                        url_for('.home',page=pagination.prev().page)
+                        }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+            {% for page in pagination.iter_pages() %}
+                {% if page %}
+                    {% if page !=pagination.page %}
+                        <li>
+                            <a href="{{ url_for(endpoint,page=page) }}">
+                                {{ page }}
+                            </a>
+                        </li>
+                    {% else %}
+                        <li><a href="javascript:void(0)" style="color: #ffffff;background-color:#5bc0de">{{ page }}</a></li>
+                    {% endif %}
+                {% else %}
+                    <li><a>...</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if pagination.page != pagination.pages %}
+                <li>
+                    <a href="{{ url_for('.home',page=pagination.next().page) }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% endif %}
         {% endif %}
-        {% else %}
-        <li><a>...</a></li>
-        {% endif %}
-        {% endfor %}
-        <li>
-            <a href="{{ url_for('.home',page=pagination.next().page) }}" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-            </a>
-        </li>
     </ul>
 </nav>
 {% endmacro %}
+
+{#
+{% macro render_input(name,label,type='text',value='')  %}
+    <div class="form-group" style="width: 300px">
+        <label for="{{ name }}">{{ label }}</label>
+        <input type="{{ type }}" name="{{ name }}" value="{{ value |escape }}" class="form-control" />
+    </div>
+{% endmacro %}
+#}
+
+{#
+{% macro render_checkRobot()%}
+<div class="g-recaptcha" data-sitekey="6LcgcS4UAAAAAO0etGgGBcDfCvNGO5_wirtuosX5"></div>
+{% endmacro %}
+#}
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-COMPATIBLE" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>{% block title %}Blog{% endblock %}</title>
+    <title>{% block title %}Blog{% endblock title %}</title>
     <link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap.min.css') }}">
+    <style>
+        html, body {
+            height: 100%;
+        }
+        .wrapper{
+            min-height: 100%;
+            height: auto !important;
+            height: 100%;
+            margin: 0 auto -58px;
+        }
+        .container{
+            padding-bottom: 58px;
+        }
+        .footer{
+            height: 30px;
+        }
+        .footerP{
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
+<div class="wrapper">
 <div class="container">
     <div class="jumbotron">
-        <h1><a href="{{ url_for('.home') }}">My Blog</a></h1>
-
-        <p>Welcome to the blog!</p>
+        <h1><a href="{{ url_for('blog.home') }}">My Blog</a></h1>
+        {% if g.current_user %}
+            <p> {{ g.current_user.username }}</p>
+        {% endif %}
     </div>
+    {% with messages=get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category,message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissable" role="alert" style="background-color: #ff9900">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                aria-hidden="true">&times;</span></button>
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
     {% block body %}
-    {% endblock %}
+    {% endblock body %}
 </div>
-<footer style="text-align: center;margin: 25px;">
-    The blog is created by Flask.
+</div>
+<footer class="footer">
+    <p class="footerP">The blog is created by Flask.</p>
 </footer>
 <script src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
 <script src="{{ url_for('static',filename='js/bootstrap.min.js') }}"></script>
+{% block js %}
+{% endblock js %}
 </body>
 </html>

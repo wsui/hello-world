@@ -4,10 +4,10 @@ __author__ = 'wen'
 import datetime
 from os import path
 from sqlalchemy import func
-from flask import Flask, g, session, abort, render_template, Blueprint
+from flask import g, abort, render_template, Blueprint, redirect, url_for, flash, session
 
 from webapp.models import db, Post, Tag, Comment, User, tags
-from webapp.forms import CommentForm
+from webapp.forms import CommentForm, PostForm
 
 # 使用蓝图
 blog_blueprint = Blueprint(
@@ -33,20 +33,36 @@ def sidebar_data():
 
 # 截取字符串指定长度
 @blog_blueprint.app_template_filter('j_str')
-def j_str(s, n):
+def j_str(s, n=16):
     if len(s) < n:
         return s
     else:
         return s[:n]
 
 
+@blog_blueprint.before_request
+def check_user():
+    if 'username' in session:
+        g.current_user = User.query.filter_by(
+            username=session['username']
+        ).one()
+    else:
+        g.current_user = None
+
+
 @blog_blueprint.route('/')
 @blog_blueprint.route('/<int:page>')
 def home(page=1):
+    if not g.current_user:
+        return redirect(url_for('main.login'))
+    user = g.current_user
+    posts = user.posts.order_by(Post.publish_date.desc()).paginate(page, 10)
+    # posts=user.posts.paginate(page,10)
+    '''
     posts = Post.query.order_by(
         Post.publish_date.desc()
     ).paginate(page, 10)
-    user = User.query.first()
+    '''
     recent, top_tags = sidebar_data()
     return render_template(
         'index.html',
@@ -117,9 +133,58 @@ def user(username):
     )
 
 
+"""
 @blog_blueprint.route('/restricted')
 def admin():
     if g.user is None:
         abort(403)
     return render_template('admin.html')
+"""
 
+
+@blog_blueprint.route('/new', methods=['GET', 'POST'])
+def new_post():
+    if not g.current_user:
+        return redirect(url_for('main.login'))
+
+    form = PostForm()
+
+    if form.validate_on_submit():
+        new_post = Post(form.title.data)
+        new_post.text = form.text.data
+        new_post.publish_date = datetime.datetime.now()
+        new_post.user = g.current_user
+
+        db.session.add(new_post)
+        db.session.commit()
+        return redirect(url_for('.post', post_id=new_post.id))
+    return render_template('new.html', form=form)
+
+
+@blog_blueprint.route('/edit/<int:id>', methods=['GET', 'POST'])
+def edit_post(id):
+    if not g.current_user:
+        return redirect(url_for('main.login'))
+
+    post = Post.query.get_or_404(id)
+    if g.current_user != post.user:
+        abort(403)
+
+    form = PostForm()
+
+    if form.validate_on_submit():
+        if form.title.data == post.title and form.text.data == post.text:
+            flash('no changes detected!', category='message')
+        else:
+            post.title = form.title.data
+            post.text = form.text.data
+            post.publish_date = datetime.datetime.now()
+
+            db.session.add(post)
+            db.session.commit()
+
+            return redirect(url_for('.post', post_id=post.id))
+
+    form.text.data = post.text
+
+    return render_template('edit.html', form=form, post=post)
