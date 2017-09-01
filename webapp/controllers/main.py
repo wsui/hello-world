@@ -47,7 +47,6 @@ def login():
     return render_template('login.html', form=form, openid_form=openid_form)
 
 
-
 @main_blueprint.route('/logout', methods=['GET', 'POST'])
 def logout():
     # Remove the username from the cookie
@@ -84,7 +83,7 @@ def register():
     if openid_errors:
         flash(openid_errors, category='danger')
 
-    return render_template('register.html', form=form)
+    return render_template('register.html', form=form, openid_form=openid_form)
 
 
 @main_blueprint.route('/facebook')

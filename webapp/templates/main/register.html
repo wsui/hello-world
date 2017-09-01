@@ -4,7 +4,6 @@
 
 {% block body %}
 <form method="post" action="{{ url_for('.register') }}">
-
     {{form.hidden_tag()}}
     <div class="form-group">
         {{ form.username.label }}
@@ -33,7 +32,14 @@
             {% endif %}
         {{ form.confirm(class_='form-control') }}
     </div>
-<div class="g-recaptcha" data-sitekey="6LcgcS4UAAAAAO0etGgGBcDfCvNGO5_wirtuosX5"></div>
+    <div class="form-group">
+         {% if form.recaptcha.errors %}
+            {% for error in form.recaptcha.errors %}
+                <p>验证失败：{{ error }}</p>
+            {% endfor %}
+        {% endif %}
+        {{ form.recaptcha }}
+    </div>
 <input type="submit" value="Register" class="btn btn-primary" />
 </form>
 <h2 class="text-center"><a href="{{ url_for('.facebook_login') }}">Register With Facebook</a></h2>

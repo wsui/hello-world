@@ -42,12 +42,12 @@ class LoginForm(FlaskForm):
         try:
             # 检查密码是否匹配
             if not user.check_password(self.password.data):
-                self.username.errors.append(
+                self.password.errors.append(
                     'Invalid password'
                 )
                 return False
         except:
-            self.username.errors.append(
+            self.password.errors.append(
                 'error'
             )
             return False
@@ -59,15 +59,17 @@ class LoginForm(FlaskForm):
 class RegisterForm(FlaskForm):
     username = StringField('Username', [
         DataRequired(),
-        Length(max=255)
+        Length(max=255, message=u'用户名长度不能大于255'),
+        Length(min=6, message=u'用户名长度不能小于6')
     ])
     password = PasswordField('Password', [
         DataRequired(),
-        Length(min=8)
+        Length(min=8, message=u'密码长度必须大于等于8'),
+        Length(max=255, message=u'密码长度不能超过255')
     ])
     confirm = PasswordField('Confirm Password', [
         DataRequired(),
-        EqualTo('password')
+        EqualTo('password', message=u'前后密码不一致')
     ])
     recaptcha = RecaptchaField()
 
