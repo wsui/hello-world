@@ -2,10 +2,20 @@
 __author__ = 'wen'
 
 from flask_sqlalchemy import SQLAlchemy
-from webapp.extensions import bcrypt
-
+from webapp.extensions import bcrypt, login_manager
+from flask_login import AnonymousUserMixin, UserMixin
 
 db = SQLAlchemy()
+
+
+class AnonymousUser(AnonymousUserMixin):
+    # confirmed = False
+    @property
+    def is_active(self):
+        return False
+
+
+login_manager.anonymous_user = AnonymousUser
 
 # 用户信息
 class User(db.Model):
@@ -29,6 +39,24 @@ class User(db.Model):
 
     def check_password(self, password):
         return bcrypt.check_password_hash(self.password, password)
+
+    def is_authenticated(self):
+        if isinstance(self, AnonymousUserMixin):
+            return False
+        else:
+            return True
+
+    def is_active(self):
+        return True
+
+    def is_annoymous(self):
+        if isinstance(self, AnonymousUserMixin):
+            return True
+        else:
+            return False
+
+    def get_id(self):
+        return unicode(self.id)
 
 
 # 标签
@@ -84,5 +112,6 @@ class Comment(db.Model):
 
     def __repr__(self):
         return '<Comment "{}">'.format(self.text[:15])
+
 
 

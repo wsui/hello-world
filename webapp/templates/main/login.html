@@ -6,21 +6,29 @@
     {{form.hidden_tag()}}
     <div class="form-group">
         {{ form.username.label }}
-            {% if form.username.errors %}
-            {% for e in form.username.errors %}
-            <p class="help-block">{{ e }}</p>
-            {% endfor %}
-            {% endif %}
+        {% if form.username.errors %}
+        {% for e in form.username.errors %}
+        <p class="help-block">{{ e }}</p>
+        {% endfor %}
+        {% endif %}
         {{ form.username(class_='form-control') }}
     </div>
     <div class="form-group">
         {{ form.password.label }}
-            {% if form.password.errors %}
-            {% for e in form.password.errors %}
-            <p class="help-block">{{ e }}</p>
-            {% endfor %}
-            {% endif %}
+        {% if form.password.errors %}
+        {% for e in form.password.errors %}
+        <p class="help-block">{{ e }}</p>
+        {% endfor %}
+        {% endif %}
         {{ form.password(class_='form-control') }}
+    </div>
+    <div class="row" style="margin-bottom: 15px">
+        <div class="col-md-1" style="width: 30px">
+            {{ form.remember(class='checkbox inline') }}
+        </div>
+        <div class="col-md-1" style="width: 300px">
+            {{ form.remember.label }}
+        </div>
     </div>
     <input class="btn btn-primary" type="submit" value="Login"/>
 </form>

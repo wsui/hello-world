@@ -1,8 +1,8 @@
 # -*- coding:utf-8 -*-
 __author__ = 'wen'
 
-import urllib, json
 from flask import Blueprint, redirect, url_for, render_template, flash, request, session
+from flask_login import login_user, logout_user
 from webapp.forms import LoginForm, RegisterForm, OpenIDForm
 from webapp.models import db, User
 from webapp.extensions import oid, facebook
@@ -35,8 +35,14 @@ def login():
         )
 
     if form.validate_on_submit():
+        user = User.query.filter_by(
+            username=form.username.data
+        ).one()
+        login_user(user, remember=form.remember.data)
+        """
         # Add user's name to the cookie
         session['username'] = form.username.data
+        """
 
         flash('You have been logged in.', category='success')
         return redirect(url_for('blog.home'))
@@ -49,8 +55,11 @@ def login():
 
 @main_blueprint.route('/logout', methods=['GET', 'POST'])
 def logout():
+    logout_user()
+    """
     # Remove the username from the cookie
     session.pop('username', None)
+    """
     flash('You have been logged out.', category='success')
     return redirect(url_for('blog.home'))
 

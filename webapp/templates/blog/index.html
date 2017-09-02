@@ -14,30 +14,36 @@
 <div class="row">
     <div class="col-lg-9">
         {% for post in posts.items %}
-        <div class="row">
-            <div class="col-lg-12">
-                <h3>{{ post.title }}</h3>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-12">
-                <p style="color: #464646">
-                    <span><a href="{{
-                    url_for('.user',username=user.username)
-                    }}">{{user.username}}</a></span>
-                    <span>&nbsp;&nbsp;</span>
-                    <span>{{ post.publish_date | string | j_str() | safe }}</span>
-                </p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-12">
-                {{ post.text | string | truncate(255) | safe }}
-                <a href="{{
+        <section class="article" style="padding: 5px;">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1><a href="{{
                  url_for('.post',post_id=post.id)
-                 }}">Read More</a>
+                 }}">{{ post.title }}</a></h1>
+                </div>
             </div>
-        </div>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <p style="color: #464646">
+                        <span><a href="{{
+                        url_for('.user',username=user.username)
+                        }}">{{user.username}}</a></span>
+                        <span>&nbsp;&nbsp;</span>
+                        <span>{{ post.publish_date | string | j_str() | safe }}</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    {{ post.text | string | html_to_text | truncate(255) | safe }}
+                    <a href="{{
+                     url_for('.post',post_id=post.id)
+                     }}">Read More</a>
+                </div>
+            </div>
+        </section>
         {% endfor %}
     </div>
     <div class="col-lg-3">

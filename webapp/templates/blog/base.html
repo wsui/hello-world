@@ -2,37 +2,160 @@
 <nav>
     <ul class="pagination">
         {% if pagination.pages>1 %}
-            {% if pagination.page!=1 %}
-                <li>
-                    <a href="{{
-                        url_for('.home',page=pagination.prev().page)
+        {% if pagination.page!=1 %}
+        <li>
+            <a href="{{
+                        url_for(endpoint,page=pagination.prev().page)
                         }}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-            {% endif %}
-            {% for page in pagination.iter_pages() %}
-                {% if page %}
-                    {% if page !=pagination.page %}
-                        <li>
-                            <a href="{{ url_for(endpoint,page=page) }}">
-                                {{ page }}
-                            </a>
-                        </li>
-                    {% else %}
-                        <li><a href="javascript:void(0)" style="color: #ffffff;background-color:#5bc0de">{{ page }}</a></li>
-                    {% endif %}
-                {% else %}
-                    <li><a>...</a></li>
-                {% endif %}
-            {% endfor %}
-            {% if pagination.page != pagination.pages %}
-                <li>
-                    <a href="{{ url_for('.home',page=pagination.next().page) }}" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            {% endif %}
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        {% endif %}
+        {% for page in pagination.iter_pages() %}
+        {% if page %}
+        {% if page !=pagination.page %}
+        <li>
+            <a href="{{ url_for(endpoint,page=page) }}">
+                {{ page }}
+            </a>
+        </li>
+        {% else %}
+        <li><a href="javascript:void(0)" style="color: #ffffff;background-color:#5bc0de">{{ page }}</a></li>
+        {% endif %}
+        {% else %}
+        <li><a>...</a></li>
+        {% endif %}
+        {% endfor %}
+        {% if pagination.page != pagination.pages %}
+        <li>
+            <a href="{{ url_for(endpoint,page=pagination.next().page) }}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+        {% endif %}
+        {% endif %}
+    </ul>
+</nav>
+{% endmacro %}
+
+{% macro render_user_pagination(pagination,endpoint,user_name) %}
+<nav>
+    <ul class="pagination">
+        {% if pagination.pages>1 %}
+        {% if pagination.page!=1 %}
+        <li>
+            <a href="{{
+                        url_for(endpoint,username=user_name,page=pagination.prev().page)
+                        }}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        {% endif %}
+        {% for page in pagination.iter_pages() %}
+        {% if page %}
+        {% if page !=pagination.page %}
+        <li>
+            <a href="{{ url_for(endpoint,username=user_name,page=page) }}">
+                {{ page }}
+            </a>
+        </li>
+        {% else %}
+        <li><a href="javascript:void(0)" style="color: #ffffff;background-color:#5bc0de">{{ page }}</a></li>
+        {% endif %}
+        {% else %}
+        <li><a>...</a></li>
+        {% endif %}
+        {% endfor %}
+        {% if pagination.page != pagination.pages %}
+        <li>
+            <a href="{{ url_for(endpoint,username=user_name,page=pagination.next().page) }}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+        {% endif %}
+        {% endif %}
+    </ul>
+</nav>
+{% endmacro %}
+
+
+{% macro render_tag_pagination(pagination,endpoint,tag_name) %}
+<nav>
+    <ul class="pagination">
+        {% if pagination.pages>1 %}
+        {% if pagination.page!=1 %}
+        <li>
+            <a href="{{
+                        url_for(endpoint,tag_name=tag_name,page=pagination.prev().page)
+                        }}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        {% endif %}
+        {% for page in pagination.iter_pages() %}
+        {% if page %}
+        {% if page !=pagination.page %}
+        <li>
+            <a href="{{ url_for(endpoint,tag_name=tag_name,page=page) }}">
+                {{ page }}
+            </a>
+        </li>
+        {% else %}
+        <li><a href="javascript:void(0)" style="color: #ffffff;background-color:#5bc0de">{{ page }}</a></li>
+        {% endif %}
+        {% else %}
+        <li><a>...</a></li>
+        {% endif %}
+        {% endfor %}
+        {% if pagination.page != pagination.pages %}
+        <li>
+            <a href="{{ url_for(endpoint,tag_name=tag_name,page=pagination.next().page) }}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+        {% endif %}
+        {% endif %}
+    </ul>
+</nav>
+{% endmacro %}
+
+
+
+{% macro render_comment_pagination(pagination,endpoint,post_id,tag_name) %}
+<nav>
+    <ul class="pagination">
+        {% if pagination.pages>1 %}
+        {% if pagination.page!=1 %}
+        <li>
+            <a href="{{
+                        url_for(endpoint,post_id=post_id,page=pagination.prev().page)
+                        }}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        {% endif %}
+        {% for page in pagination.iter_pages() %}
+        {% if page %}
+        {% if page !=pagination.page %}
+        <li>
+            <a href="{{ url_for(endpoint,post_id=post_id,page=page) }}">
+                {{ page }}
+            </a>
+        </li>
+        {% else %}
+        <li><a href="javascript:void(0)" style="color: #ffffff;background-color:#5bc0de">{{ page }}</a></li>
+        {% endif %}
+        {% else %}
+        <li><a>...</a></li>
+        {% endif %}
+        {% endfor %}
+        {% if pagination.page != pagination.pages %}
+        <li>
+            <a href="{{ url_for(endpoint,post_id=post_id,page=pagination.next().page) }}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+        {% endif %}
         {% endif %}
     </ul>
 </nav>
@@ -40,10 +163,10 @@
 
 {#
 {% macro render_input(name,label,type='text',value='')  %}
-    <div class="form-group" style="width: 300px">
-        <label for="{{ name }}">{{ label }}</label>
-        <input type="{{ type }}" name="{{ name }}" value="{{ value |escape }}" class="form-control" />
-    </div>
+<div class="form-group" style="width: 300px">
+    <label for="{{ name }}">{{ label }}</label>
+    <input type="{{ type }}" name="{{ name }}" value="{{ value |escape }}" class="form-control"/>
+</div>
 {% endmacro %}
 #}
 
@@ -65,48 +188,59 @@
         html, body {
             height: 100%;
         }
-        .wrapper{
+
+        .wrapper {
             min-height: 100%;
             height: auto !important;
             height: 100%;
             margin: 0 auto -58px;
         }
-        .container{
+
+        .container {
             padding-bottom: 58px;
         }
-        .footer{
+
+        .footer {
             height: 30px;
         }
-        .footerP{
+
+        .footerP {
             text-align: center;
             margin-top: 20px;
+        }
+
+        .article {
+            box-shadow: 0 0 10px #cccccc;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 <div class="wrapper">
-<div class="container">
-    <div class="jumbotron">
-        <h1><a href="{{ url_for('blog.home') }}">My Blog</a></h1>
-        {% if g.current_user %}
-            <p> {{ g.current_user.username }}</p>
+    <div class="container">
+        <div class="jumbotron">
+            <h1><a href="{{ url_for('blog.home') }}">Star Blog</a></h1>
+            {% if current_user %}
+            <p> {{ current_user.username }}</p>
+            {% endif %}
+        </div>
+        {% with messages=get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category,message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissable" role="alert" style="background-color: #ff9900">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                    aria-hidden="true">&times;</span></button>
+            {{ message }}
+        </div>
+        {% endfor %}
         {% endif %}
-    </div>
-    {% with messages=get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    {% for category,message in messages %}
-    <div class="alert alert-{{ category }} alert-dismissable" role="alert" style="background-color: #ff9900">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                aria-hidden="true">&times;</span></button>
-        {{ message }}
-    </div>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
+        {% endwith %}
 
-    {% block body %}
-    {% endblock body %}
-</div>
+        {% block body %}
+        {% endblock body %}
+    </div>
 </div>
 <footer class="footer">
     <p class="footerP">The blog is created by Flask.</p>

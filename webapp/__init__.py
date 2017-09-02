@@ -8,16 +8,17 @@ from flask.views import View
 from models import db
 from controllers.blog import blog_blueprint
 from controllers.main import main_blueprint
-from webapp.extensions import bcrypt,oid
+from webapp.extensions import bcrypt, oid, login_manager
 
 
 def create_app(objecrt_name):
     app = Flask(__name__)
-    app.config.from_object(DevConfig)
+    app.config.from_object(objecrt_name)
 
     db.init_app(app)
     bcrypt.init_app(app)
     oid.init_app(app)
+    login_manager.init_app(app)
 
     # 根目录重定向到蓝图
     @app.route('/')

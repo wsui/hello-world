@@ -5,10 +5,25 @@ from flask_bcrypt import Bcrypt
 from flask_openid import OpenID
 from flask import flash, redirect, url_for, session
 from flask_oauth import OAuth
+from flask_login import LoginManager, AnonymousUserMixin
 
 bcrypt = Bcrypt()
 oid = OpenID()
 oauth = OAuth()
+login_manager = LoginManager()
+
+
+login_manager.login_view = 'main.login'
+login_manager.session_protection = 'strong'
+login_manager.login_message = 'Please login to access this page'
+login_manager.login_message_category = 'info'
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    from models import User
+
+    return User.query.get(user_id)
 
 
 @oid.after_login
@@ -26,6 +41,11 @@ def create_or_login(resp):
         user = User(username)
         db.session.add(user)
         db.session.commit()
+    load_user(user)
+    """
+    # 用户登录
+    session['username'] = user.username.data
+    """
     return redirect(url_for('blog.home'))
 
 
