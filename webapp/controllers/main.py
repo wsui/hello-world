@@ -1,8 +1,9 @@
 # -*- coding:utf-8 -*-
 __author__ = 'wen'
 
-from flask import Blueprint, redirect, url_for, render_template, flash, request, session
-from flask_login import login_user, logout_user,current_user
+from flask import Blueprint, redirect, url_for, render_template, flash, request, session, current_app
+from flask_login import login_user, logout_user, current_user
+from flask_principal import Identity, AnonymousIdentity, identity_changed
 from webapp.forms import LoginForm, RegisterForm, OpenIDForm
 from webapp.models import db, User
 from webapp.extensions import oid, facebook
@@ -43,6 +44,10 @@ def login():
         # Add user's name to the cookie
         session['username'] = form.username.data
         """
+        identity_changed.send(
+            current_app._get_current_object(),
+            identity=Identity(user.id)
+        )
 
         flash('You have been logged in.', category='success')
         return redirect(url_for('blog.home'))
@@ -60,6 +65,10 @@ def logout():
     # Remove the username from the cookie
     session.pop('username', None)
     """
+    identity_changed.send(
+        current_app._get_current_object(),
+        identity=AnonymousIdentity()
+    )
     flash('You have been logged out.', category='success')
     return redirect(url_for('blog.home'))
 

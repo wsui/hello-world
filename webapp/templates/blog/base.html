@@ -215,19 +215,44 @@
             padding: 0px 10px 10px 10px;
             border-radius: 5px;
             word-wrap: break-word;
-
         }
     </style>
 </head>
 <body>
 <div class="wrapper">
     <div class="container">
-        <div class="jumbotron">
-            <h1><a href="{{ url_for('blog.home') }}">Star Blog</a></h1>
-            {% if current_user %}
-            <p> {{ current_user.username }}</p>
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="container-fluid">
+                <ul class="nav navbar-nav navbar-left">
+                    {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for('blog.new_post') }}" style="color: #cc6600"><img
+                            src="{{ url_for('static',filename='imgs/new.png') }}" height="20"/>&nbsp;写文章</a></li>
+                    {% endif %}
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="{{ url_for('blog.home') }}">主页</a></li>
+                    {% if current_user.is_authenticated %}
+                    <li><a href="{{url_for('blog.user',username=current_user.username)}}">{{ current_user.username
+                        }}</a></li>
+                    <li><a href="{{ url_for('main.logout') }}">注销</a></li>
+                    {% else %}
+                    <li><a href="{{ url_for('main.login') }}">登录</a></li>
+                    <li><a href="{{ url_for('main.register')}}">注册</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+        {% block head %}
+        <div class="jumbotron" style="padding: 10px">
+            {% if current_user.is_authenticated %}
+            <h1>{{ current_user.username }}的博客</h1>
+
+            <p>写几句话介绍一下自己吧！</p>
+            {% else %}
+            <h1>star blog</h1>
             {% endif %}
         </div>
+        {% endblock head %}
         {% with messages=get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category,message in messages %}

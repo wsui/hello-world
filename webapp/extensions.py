@@ -5,13 +5,18 @@ from flask_bcrypt import Bcrypt
 from flask_openid import OpenID
 from flask import flash, redirect, url_for, session
 from flask_oauth import OAuth
-from flask_login import LoginManager, AnonymousUserMixin,login_user
+from flask_login import LoginManager, AnonymousUserMixin, login_user
+from flask_principal import Principal, Permission, RoleNeed
+
+principlals = Principal()
+admin_permission = Permission(RoleNeed('admin'))
+poster_permission = Permission(RoleNeed('poster'))
+default_permission = Permission(RoleNeed('default'))
 
 bcrypt = Bcrypt()
 oid = OpenID()
 oauth = OAuth()
 login_manager = LoginManager()
-
 
 login_manager.login_view = 'main.login'
 login_manager.session_protection = 'strong'

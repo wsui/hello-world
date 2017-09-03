@@ -17,10 +17,16 @@ class AnonymousUser(AnonymousUserMixin):
 
 login_manager.anonymous_user = AnonymousUser
 
+roles = db.Table(
+    'role_users',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('role_id', db.Integer, db.ForeignKey('role.id'))
+)
+
 # 用户信息
 class User(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
-    username = db.Column('user_name', db.String(255))
+    username = db.Column('user_name', db.String(255), unique=True)
     password = db.Column('password', db.String(255))
     posts = db.relationship(
         'Post',
@@ -28,8 +34,16 @@ class User(db.Model):
         lazy='dynamic'
     )
 
+    roles = db.relationship(
+        'Role',
+        secondary=roles,
+        backref=db.backref('users', lazy='dynamic')
+    )
+
     def __init__(self, username):
         self.username = username
+        default = Role.query.filter(name='default').one()
+        self.roles.append(default)
 
     def __repr__(self):
         return '<User "{},{},{}">'.format(self.username, self.id, self.password)
@@ -58,6 +72,17 @@ class User(db.Model):
     def get_id(self):
         return unicode(self.id)
 
+
+class Role(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(), unique=True)
+    description = db.Column(db.String(255))
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return '<Role {}>'.format(self.name)
 
 # 标签
 tags = db.Table('post_tags',

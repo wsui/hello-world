@@ -7,9 +7,11 @@ from bs4 import BeautifulSoup
 from sqlalchemy import func
 from flask import g, abort, render_template, Blueprint, redirect, url_for, flash, request
 from flask_login import login_required, current_user, login_user
-
+from flask_principal import Permission, UserNeed
 from webapp.models import db, Post, Tag, Comment, User, tags
 from webapp.forms import CommentForm, PostForm
+from webapp.extensions import poster_permission, admin_permission
+
 
 # 使用蓝图
 blog_blueprint = Blueprint(
@@ -194,6 +196,7 @@ def new_post():
 
 @blog_blueprint.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
+# @poster_permission.require(http_exception=403)
 def edit_post(id):
     # 此处验证用login_required装饰器代替
     """
@@ -201,24 +204,26 @@ def edit_post(id):
         return redirect(url_for('main.login'))
     """
     post = Post.query.get_or_404(id)
+    # 此处使用用户权限进行限制访问
+    """
     if current_user != post.user:
         abort(403)
+    """
+    permission = Permission(UserNeed(post.user.id))
+    if permission.can() or admin_permission.can():
+        form = PostForm()
+        if form.validate_on_submit():
+            if form.title.data == post.title and form.text.data == post.text:
+                flash('no changes detected!', category='message')
+            else:
+                post.title = form.title.data
+                post.text = form.text.data
+                post.publish_date = datetime.datetime.now()
 
-    form = PostForm()
+                db.session.add(post)
+                db.session.commit()
 
-    if form.validate_on_submit():
-        if form.title.data == post.title and form.text.data == post.text:
-            flash('no changes detected!', category='message')
-        else:
-            post.title = form.title.data
-            post.text = form.text.data
-            post.publish_date = datetime.datetime.now()
-
-            db.session.add(post)
-            db.session.commit()
-
-            return redirect(url_for('.post', post_id=post.id))
-
-    form.text.data = post.text
-
-    return render_template('edit.html', form=form, post=post)
+                return redirect(url_for('.post', post_id=post.id))
+        form.text.data = post.text
+        return render_template('edit.html', form=form, post=post)
+    abort(403)

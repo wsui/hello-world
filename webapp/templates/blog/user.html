@@ -1,7 +1,19 @@
 {% extends "base.html" %}
 {% block title %}{{ user.username }}{% endblock %}
-{% block body %}
 
+{% block head %}
+<div class="jumbotron" style="padding: 10px">
+    {% if current_user.is_authenticated %}
+    <h1>{{ user.username }}的博客</h1>
+
+    <p>写几句话介绍一下自己吧！</p>
+    {% else %}
+    <h1>star blog</h1>
+    {% endif %}
+</div>
+{% endblock head %}
+
+{% block body %}
 <div class="row">
     <div class="col-lg-9">
         {% for post in posts.items %}
