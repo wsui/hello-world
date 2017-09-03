@@ -2,7 +2,7 @@
 __author__ = 'wen'
 
 from flask import Blueprint, redirect, url_for, render_template, flash, request, session
-from flask_login import login_user, logout_user
+from flask_login import login_user, logout_user,current_user
 from webapp.forms import LoginForm, RegisterForm, OpenIDForm
 from webapp.models import db, User
 from webapp.extensions import oid, facebook

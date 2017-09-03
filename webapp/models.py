@@ -11,7 +11,7 @@ db = SQLAlchemy()
 class AnonymousUser(AnonymousUserMixin):
     # confirmed = False
     @property
-    def is_active(self):
+    def is_authenticated(self):
         return False
 
 
@@ -41,7 +41,7 @@ class User(db.Model):
         return bcrypt.check_password_hash(self.password, password)
 
     def is_authenticated(self):
-        if isinstance(self, AnonymousUserMixin):
+        if isinstance(self, AnonymousUser):
             return False
         else:
             return True
@@ -50,7 +50,7 @@ class User(db.Model):
         return True
 
     def is_annoymous(self):
-        if isinstance(self, AnonymousUserMixin):
+        if isinstance(self, AnonymousUser):
             return True
         else:
             return False

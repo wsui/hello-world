@@ -20,7 +20,7 @@
             {{ form.text.label }}
             {% if form.text.errors %}
             {% for e in form.text.errors %}
-            <p class="help-block">{{ e }}}</p>
+            <p class="help-block">{{ e }}</p>
             {% endfor %}
             {% endif %}
             {{ form.text(id='editor', class_='form-control') }}

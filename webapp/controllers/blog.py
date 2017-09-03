@@ -6,7 +6,7 @@ from os import path
 from bs4 import BeautifulSoup
 from sqlalchemy import func
 from flask import g, abort, render_template, Blueprint, redirect, url_for, flash, request
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, login_user
 
 from webapp.models import db, Post, Tag, Comment, User, tags
 from webapp.forms import CommentForm, PostForm
@@ -46,7 +46,16 @@ def j_str(s, n=16):
 @blog_blueprint.app_template_filter('html_to_text')
 def html_to_text(html):
     soup = BeautifulSoup(html, 'html.parser')
+    [s.extract() for s in soup('script')]
     return soup.get_text()
+
+
+# 去除html中的script标签
+@blog_blueprint.app_template_filter('del_js_Tag')
+def delete_script_tag(html):
+    soup = BeautifulSoup(html, 'html.parser')
+    [s.extract() for s in soup('script')]
+    return soup
 
 
 """
@@ -69,7 +78,7 @@ def home(page=1):
         return redirect(url_for('main.login'))
     user = g.current_user
     """
-    if not current_user.is_active:
+    if not current_user.is_authenticated:
         return redirect(url_for('main.login'))
     user = current_user
     posts = user.posts.order_by(Post.publish_date.desc()).paginate(page, 10)
@@ -90,7 +99,7 @@ def home(page=1):
 
 
 @blog_blueprint.route('/post/<int:post_id>', methods=('get', 'post'))
-@blog_blueprint.route('/post/<int:post_id>/comment_page<int:page>', methods=('get', 'post'))
+@blog_blueprint.route('/post/<int:post_id>/<int:page>', methods=('get', 'post'))
 def post(post_id, page=1):
     form = CommentForm()
     if form.validate_on_submit():
@@ -175,7 +184,7 @@ def new_post():
         new_post = Post(form.title.data)
         new_post.text = form.text.data
         new_post.publish_date = datetime.datetime.now()
-        new_post.user = g.current_user
+        new_post.user = current_user
 
         db.session.add(new_post)
         db.session.commit()

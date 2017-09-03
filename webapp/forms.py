@@ -1,7 +1,9 @@
 # -*- coding:utf-8 -*-
 __author__ = 'wen'
 
+from bs4 import BeautifulSoup
 from flask_wtf import FlaskForm, RecaptchaField
+import wtforms
 from wtforms import StringField, TextAreaField, PasswordField, BooleanField
 from wtforms.validators import DataRequired, Length, EqualTo, URL
 from models import User
@@ -97,11 +99,26 @@ class RegisterForm(FlaskForm):
 
 # 写文章表单
 class PostForm(FlaskForm):
+    # 对文章的长度进行限制
+    def Blog_length_limit(form, field):
+        soup = BeautifulSoup(field.data, 'html.parser')
+        [s.extract() for s in soup('script')]
+        length = len(soup.get_text().strip())
+        if length < 10:
+            raise wtforms.ValidationError(u'文章太短了，多敲几个字吧')
+        if length > 20000:
+            raise wtforms.ValidationError(u'文章长度超限，不能大于20000')
+
     title = StringField('Title', [
         DataRequired(),
         Length(max=255)
     ])
-    text = TextAreaField('Content', [DataRequired()])
+    text = TextAreaField('Content', [
+        DataRequired(),
+        Length(min=6),
+        Length(max=100000),
+        Blog_length_limit
+    ])
 
 
 # 第三方登录表单

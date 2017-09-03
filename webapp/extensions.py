@@ -5,7 +5,7 @@ from flask_bcrypt import Bcrypt
 from flask_openid import OpenID
 from flask import flash, redirect, url_for, session
 from flask_oauth import OAuth
-from flask_login import LoginManager, AnonymousUserMixin
+from flask_login import LoginManager, AnonymousUserMixin,login_user
 
 bcrypt = Bcrypt()
 oid = OpenID()
@@ -41,7 +41,7 @@ def create_or_login(resp):
         user = User(username)
         db.session.add(user)
         db.session.commit()
-    load_user(user)
+    load_user(user.id)
     """
     # 用户登录
     session['username'] = user.username.data
